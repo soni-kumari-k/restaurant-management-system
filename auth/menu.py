@@ -1,7 +1,8 @@
-from sign_up import signup
-from sign_in import signin
-from admin import admin_menu
-from staff import staff_menu
+from auth.sign_up import signup
+from auth.sign_in import signin
+from dashboard.admin import admin_menu
+from dashboard.staff import staff_menu
+
 
 
 def main_menu():
@@ -36,6 +37,8 @@ def main_menu():
         elif choice == "3":
             print("Thank you!")
             break
+            
 
         else:
             print("Invalid choice!")
+            return

@@ -1,1 +1,6 @@
-# for import
+from auth.menu import main_menu
+
+main_menu()
+
+
+

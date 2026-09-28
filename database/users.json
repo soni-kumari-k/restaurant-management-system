@@ -1,0 +1,26 @@
+[
+    {
+        "name": "soni",
+        "email": "soni@gmail.com",
+        "password": "s1234",
+        "role": "admin"
+    },
+    {
+        "name": "Rajmani",
+        "email": "Rajmnai@gmail.com",
+        "password": "Raj",
+        "role": "staff"
+    },
+    {
+        "name": "nandani",
+        "email": "Nandani@gmail.com",
+        "password": "Nandani321",
+        "role": "staff"
+    },
+    {
+        "name": "neha",
+        "email": "neha@gmail.com",
+        "password": "neha",
+        "role": "staff"
+    }
+]
