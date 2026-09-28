@@ -2,7 +2,7 @@ import json
 import os
 
 
-FILE = "data/users.json"
+FILE = "database/users.json"
 
 
 def signup():
@@ -11,25 +11,36 @@ def signup():
     print("           SIGN UP")
     print("==============================")
 
-    name = input("Enter Name: ").strip()
+    while True:
 
-    if not name.isalpha() or len(name) < 3:
-        print("Invalid name!")
-        return
+        name = input("Enter Name: ").strip()
 
-    email = input("Enter Email: ").strip()
+        if name.isalpha() and len(name) >= 3:
+            break
 
-    if "@" not in email or "." not in email:
-        print("Invalid email!")
-        return
+        print("Invalid name! Please try again.")
 
-    password = input("Enter Password: ")
 
-    if len(password) < 3:
-        print("Password must contain at least 3 characters!")
-        return
+    while True:
 
-    os.makedirs("data", exist_ok=True)
+        email = input("Enter Email: ").strip()
+
+        if "@" in email and "." in email:
+            break
+
+        print("Invalid email! Please try again.")
+
+
+    while True:
+
+        password = input("Enter Password: ")
+
+        if password.isalnum() and len(password) >= 3:
+            break
+
+        print("Password must be atleast 3 characters")
+
+    os.makedirs("database", exist_ok=True)
 
     if os.path.exists(FILE):
 
@@ -86,3 +97,5 @@ def signup():
     print("\nRegistration successful!")
     print("Role:", role)
     print("You can now Sign In.")
+
+    
