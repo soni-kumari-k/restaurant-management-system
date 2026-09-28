@@ -2,12 +2,12 @@ import json
 import os
 
 
-FILE = "data/inventory.json"
+FILE = "database/inventory.json"
 
 
 def load_inventory():
 
-    os.makedirs("data", exist_ok=True)
+    os.makedirs("database", exist_ok=True)
 
     if os.path.exists(FILE):
 

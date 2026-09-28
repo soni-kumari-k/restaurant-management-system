@@ -1,15 +1,44 @@
 import json
 import os
+import uuid
 
 
 FILE = "database/users.json"
 
 
-def signup():
+def generate_user_id(users):
 
-    print("\n==============================")
-    print("           SIGN UP")
-    print("==============================")
+    while True:
+
+        user_id = str(uuid.uuid4().int)[:10]
+
+        exists = False
+
+        for user in users:
+
+            if user["user_id"] == user_id:
+
+                exists = True
+                break
+
+        if not exists:
+
+            return user_id
+
+
+def signup(role):
+
+    if role == "admin":
+
+        print("\n================================")
+        print("           ADMIN SIGN UP")
+        print("================================")
+
+    else:
+
+        print("\n================================")
+        print("           STAFF SIGN UP")
+        print("================================")
 
     while True:
 
@@ -20,7 +49,6 @@ def signup():
 
         print("Invalid name! Please try again.")
 
-
     while True:
 
         email = input("Enter Email: ").strip()
@@ -30,15 +58,14 @@ def signup():
 
         print("Invalid email! Please try again.")
 
-
     while True:
 
         password = input("Enter Password: ")
 
-        if password.isalnum() and len(password) >= 3:
+        if 8 <= len(password) <= 15:
             break
 
-        print("Password must be atleast 3 characters")
+        print("Password must be 8 to 15 characters!")
 
     os.makedirs("database", exist_ok=True)
 
@@ -48,41 +75,29 @@ def signup():
             users = json.load(file)
 
     else:
+
         users = []
 
     for user in users:
 
         if user["email"] == email:
+
             print("Email already registered!")
             return
 
-    admin_exists = False
+    if role == "admin":
 
-    for user in users:
+        for user in users:
 
-        if user["role"] == "admin":
-            admin_exists = True
-            break
+            if user["role"] == "admin":
 
-    if admin_exists:
+                print("Admin already exists!")
+                return
 
-        role = "staff"
-
-        print("Admin already exists.")
-        print("New account will be created as Staff.")
-
-    else:
-
-        print("\nNo Admin account found.")
-        print("You can create the Admin account.")
-
-        role = input("Enter Role (admin/staff): ").lower()
-
-        if role not in ["admin", "staff"]:
-            print("Role must be admin or staff!")
-            return
+    user_id = generate_user_id(users)
 
     new_user = {
+        "user_id": user_id,
         "name": name,
         "email": email,
         "password": password,
@@ -94,8 +109,5 @@ def signup():
     with open(FILE, "w") as file:
         json.dump(users, file, indent=4)
 
-    print("\nRegistration successful!")
-    print("Role:", role)
-    print("You can now Sign In.")
-
-    
+    print("\nRegistration Successful!")
+    print("Your User ID:", user_id)

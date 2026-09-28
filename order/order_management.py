@@ -3,8 +3,8 @@ import os
 import uuid
 
 
-MENU_FILE = "data/food_menu.json"
-ORDER_FILE = "data/orders.json"
+MENU_FILE = "database/food_menu.json"
+ORDER_FILE = "database/orders.json"
 
 
 def load_menu():
@@ -29,7 +29,7 @@ def load_orders():
 
 def save_orders(orders):
 
-    os.makedirs("data", exist_ok=True)
+    os.makedirs("database", exist_ok=True)
 
     with open(ORDER_FILE, "w") as file:
         json.dump(orders, file, indent=4)
@@ -41,34 +41,62 @@ def create_order():
     orders = load_orders()
 
     if len(menu) == 0:
+
         print("No food available in menu!")
         return
 
-    print("\n========== FOOD MENU ==========")
+    print("\n========================================================")
+    print("                     FOOD MENU")
+    print("========================================================")
+
+    print(
+            "ID","      ",        
+            "FOOD NAME","       ",     
+            "PRICE","       ",     
+            "CATEGORY","        "      
+        )
+
+    print("--------------------------------------------------------")
 
     for food in menu:
 
         print(
-            food["id"],
-            "-",
-            food["name"],
-            "- ₹",
-            food["price"]
-        )
+                    food["id"],"        " ,     
+                    food["name"],"      ",       
+                    food["price"],"        ",      
+                    food["category"],"      "        
+                )
 
-    order_id = str(uuid.uuid4().int)[:4]
+    print("========================================================")
+
+    order_id = str(uuid.uuid4().int)[:10]
+
     while True:
-        customer_name = input("Enter Customer Name: ")
-        if not customer_name.isalpha() or len(customer_name) < 3:
-                    break                        
-        print("Invalid name,please try again")
-     
-    food_id = int(input("Enter Food ID(4 digit): "))
-    quantity = input("Enter Quantity: ")
 
-    if not quantity.isdigit():
-        print("Quantity must be a number!")
-        return
+        customer_name = input("Enter Customer Name: ").strip()
+
+        if customer_name.isalpha() and len(customer_name) >= 3:
+            break
+
+        print("Invalid name! Please try again.")
+
+    while True:
+
+        food_id = input("Enter Food ID: ")
+
+        if food_id.isdigit() and len(food_id) == 4:
+            break
+
+        print("Food ID must contain exactly 4 digits!")
+
+    while True:
+
+        quantity = input("Enter Quantity: ")
+
+        if quantity.isdigit() and int(quantity) > 0:
+            break
+
+        print("Quantity must be greater than 0!")
 
     quantity = int(quantity)
 
@@ -93,7 +121,8 @@ def create_order():
             save_orders(orders)
 
             print("Order created successfully!")
-            print("Total Amount: ₹", total)
+            print("Order ID:", order_id)
+            print("Total Amount: Rs.", total)
 
             return
 
@@ -107,6 +136,7 @@ def display_orders():
     print("\n========== ORDERS ==========")
 
     if len(orders) == 0:
+
         print("No orders available!")
         return
 
@@ -136,13 +166,17 @@ def order_management():
         choice = input("Enter your choice: ")
 
         if choice == "1":
+
             create_order()
 
         elif choice == "2":
+
             display_orders()
 
         elif choice == "3":
+
             break
 
         else:
+
             print("Invalid choice!")

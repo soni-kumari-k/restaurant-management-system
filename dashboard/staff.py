@@ -1,6 +1,6 @@
-from table_booking import table_booking
-from order import order_management
-from billing import billing
+from table_booking.table_booking import table_booking
+from order.order_management import order_management
+from billing.billing import billing
 
 
 def staff_menu():

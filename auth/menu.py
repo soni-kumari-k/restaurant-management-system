@@ -1,44 +1,77 @@
+import json
+import os
+
 from auth.sign_up import signup
 from auth.sign_in import signin
 from dashboard.admin import admin_menu
-from dashboard.staff import staff_menu
 
+
+FILE = "database/users.json"
+
+
+def admin_exists():
+
+    if not os.path.exists(FILE):
+        return False
+
+    with open(FILE, "r") as file:
+        users = json.load(file)
+
+    for user in users:
+
+        if user["role"] == "admin":
+            return True
+
+    return False
 
 
 def main_menu():
 
     while True:
 
-        print("\n==============================")
-        print("   RESTAURANT MANAGEMENT")
-        print("==============================")
+        print("\n================================")
+        print("      RESTAURANT MANAGEMENT")
+        print("================================")
 
-        print("1. Sign Up")
-        print("2. Sign In")
-        print("3. Exit")
+        if not admin_exists():
 
-        choice = input("Enter your choice: ")
+            print("1. Admin Sign Up")
+            print("2. Exit")
 
-        if choice == "1":
-            signup()
+            choice = input("Enter your choice: ")
 
-        elif choice == "2":
+            if choice == "1":
 
-            user = signin()
+                signup("admin")
 
-            if user:
+            elif choice == "2":
 
-                if user["role"] == "admin":
-                    admin_menu()
+                print("Thank you!")
+                break
 
-                elif user["role"] == "staff":
-                    staff_menu()
+            else:
 
-        elif choice == "3":
-            print("Thank you!")
-            break
-            
+                print("Invalid choice! Please try again.")
 
         else:
-            print("Invalid choice!")
-            return
+
+            print("1. Admin Sign In")
+            print("2. Exit")
+
+            choice = input("Enter your choice: ")
+
+            if choice == "1":
+
+                user = signin("admin")
+
+                if user:
+                    admin_menu()
+
+            elif choice == "2":
+
+                print("Thank you!")
+                break
+
+            else:
+
+                print("Invalid choice! Please try again.")

@@ -2,7 +2,8 @@ import json
 import os
 import uuid
 
-FILE = "data/tables.json"
+
+FILE = "database/tables.json"
 
 
 def load_tables():
@@ -29,16 +30,34 @@ def book_table():
 
     print("\n========== TABLE BOOKING ==========")
 
-    table_id = str(uuid.uuid4().int)[:10]
-    customer_name = input("Enter Customer Name: ")
-    date = input("Enter Date: ")
-    time = input("Enter Time: ")
+    table_id = str(uuid.uuid4().int)[4]
 
-    for table in tables:
+    while True:
 
-        if table["table_id"] == table_id and table["status"] == "Booked":
-            print("Table already booked!")
-            return
+        customer_name = input("Enter Customer Name: ").strip()
+
+        if customer_name.isalpha() and len(customer_name) >= 3:
+            break
+
+        print("Invalid name! Please try again.")
+
+    while True:
+
+        date = input("Enter Date: ").strip()
+
+        if date:
+            break
+
+        print("Date cannot be empty!")
+
+    while True:
+
+        time = input("Enter Time: ").strip()
+
+        if time:
+            break
+
+        print("Time cannot be empty!")
 
     booking = {
         "table_id": table_id,
@@ -53,6 +72,7 @@ def book_table():
     save_tables(tables)
 
     print("Table booked successfully!")
+    print("Table ID:", table_id)
 
 
 def display_tables():
@@ -62,6 +82,7 @@ def display_tables():
     print("\n========== TABLE BOOKINGS ==========")
 
     if len(tables) == 0:
+
         print("No table bookings!")
         return
 
@@ -85,7 +106,17 @@ def update_table():
 
         if table["table_id"] == table_id:
 
-            table["customer_name"] = input("Enter New Customer Name: ")
+            while True:
+
+                customer_name = input("Enter New Customer Name: ").strip()
+
+                if customer_name.isalpha() and len(customer_name) >= 3:
+                    break
+
+                print("Invalid name!")
+
+            table["customer_name"] = customer_name
+
             table["date"] = input("Enter New Date: ")
             table["time"] = input("Enter New Time: ")
 
@@ -134,19 +165,25 @@ def table_booking():
         choice = input("Enter your choice: ")
 
         if choice == "1":
+
             book_table()
 
         elif choice == "2":
+
             display_tables()
 
         elif choice == "3":
+
             update_table()
 
         elif choice == "4":
+
             cancel_table()
 
         elif choice == "5":
+
             break
 
         else:
+
             print("Invalid choice!")

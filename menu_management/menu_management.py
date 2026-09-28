@@ -2,7 +2,7 @@ import json
 import os
 
 
-FILE = "data/food_menu.json"
+FILE = "database/food_menu.json"
 
 
 def load_menu():
@@ -29,28 +29,48 @@ def add_food():
 
     print("\n========== ADD FOOD ==========")
 
-    food_id = int(input("Enter Food ID(4 digit): "))
     while True:
-        name = input("Enter Food Name: ")
-        if not name.isalpha() or len(name) < 3:
-            break            
-        print("Invalid name,please try again")
-    price = int(input("Enter Price: "))
-    category = input("Enter Category: ")
 
-    if food_id == "" or name == "" or price == "" or category == "":
-        print("All fields are required!")
-        return
+        food_id = input("Enter Food ID (4 digit): ")
 
-    if not price.isdigit():
-        print("Price must be a number!")
-        return
+        if food_id.isdigit() and len(food_id) == 4:
+            break
+
+        print("Food ID must contain exactly 4 digits!")
 
     for food in menu:
 
         if food["id"] == food_id:
+
             print("Food ID already exists!")
             return
+
+    while True:
+
+        name = input("Enter Food Name: ").strip()
+
+        if name.isalpha() and len(name) >= 3:
+            break
+
+        print("Invalid food name! Please try again.")
+
+    while True:
+
+        price = input("Enter Price: ")
+
+        if price.isdigit() and int(price) > 0:
+            break
+
+        print("Price must be a positive number!")
+
+    while True:
+
+        category = input("Enter Category: ").strip()
+
+        if category:
+            break
+
+        print("Category cannot be empty!")
 
     new_food = {
         "id": food_id,
@@ -70,38 +90,78 @@ def display_food():
 
     menu = load_menu()
 
-    print("\n========== FOOD MENU ==========")
+    print("\n========================================================")
+    print("                     FOOD MENU")
+    print("========================================================")
 
     if len(menu) == 0:
+
         print("No food available!")
         return
 
+    print(
+        "ID","      ",        
+        "FOOD NAME","       ",     
+        "PRICE","       ",     
+        "CATEGORY","        "      
+    )
+
+    print("--------------------------------------------------------")
+
     for food in menu:
 
-        print("------------------------------")
-        print("ID       :", food["id"])
-        print("Name     :", food["name"])
-        print("Price    :", food["price"])
-        print("Category :", food["category"])
+        print(
+            food["id"],"        " ,     
+            food["name"],"      ",       
+            food["price"],"        ",      
+            food["category"],"      "        
+        )
+    print("========================================================")
 
 
 def update_food():
 
     menu = load_menu()
 
-    food_id = int(input("Enter Food ID to update: "))
+    while True:
+
+        food_id = input("Enter Food ID to update: ")
+
+        if food_id.isdigit() and len(food_id) == 4:
+            break
+
+        print("Food ID must contain exactly 4 digits!")
 
     for food in menu:
 
         if food["id"] == food_id:
 
-            name = input("Enter New Name: ")
-            price = input("Enter New Price: ")
-            category = input("Enter New Category: ")
+            while True:
 
-            if not price.isdigit():
-                print("Price must be a number!")
-                return
+                name = input("Enter New Name: ").strip()
+
+                if name.isalpha() and len(name) >= 3:
+                    break
+
+                print("Invalid food name!")
+
+            while True:
+
+                price = input("Enter New Price: ")
+
+                if price.isdigit() and int(price) > 0:
+                    break
+
+                print("Price must be a positive number!")
+
+            while True:
+
+                category = input("Enter New Category: ").strip()
+
+                if category:
+                    break
+
+                print("Category cannot be empty!")
 
             food["name"] = name
             food["price"] = int(price)
@@ -119,7 +179,14 @@ def delete_food():
 
     menu = load_menu()
 
-    food_id = input("Enter Food ID to delete: ")
+    while True:
+
+        food_id = input("Enter Food ID to delete: ")
+
+        if food_id.isdigit() and len(food_id) == 4:
+            break
+
+        print("Food ID must contain exactly 4 digits!")
 
     for food in menu:
 
@@ -152,19 +219,25 @@ def menu_management():
         choice = input("Enter your choice: ")
 
         if choice == "1":
+
             add_food()
 
         elif choice == "2":
+
             display_food()
 
         elif choice == "3":
+
             update_food()
 
         elif choice == "4":
+
             delete_food()
 
         elif choice == "5":
+
             break
 
         else:
-            print("Invalid choice!")
+
+            print("Invalid choice! Please try again.")

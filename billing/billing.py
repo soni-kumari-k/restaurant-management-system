@@ -72,9 +72,9 @@ def generate_bill():
             print("\n========== BILL ==========")
             print("Bill ID       :", bill_id)
             print("Customer      :", order["customer_name"])
-            print("Subtotal      : ₹", subtotal)
-            print("Tax 5%        : ₹", tax)
-            print("Grand Total   : ₹", grand_total)
+            print("Subtotal      : Rs.", subtotal)
+            print("Tax 5%        : Rs.", tax)
+            print("Grand Total   : Rs.", grand_total)
             print("==========================")
 
             return
