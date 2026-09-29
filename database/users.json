@@ -1,0 +1,16 @@
+[
+    {
+        "user_id": "3249375891",
+        "name": "soni",
+        "email": "soni@gmail.com",
+        "password": "soni1234",
+        "role": "admin"
+    },
+    {
+        "user_id": "2472799027",
+        "name": "anu",
+        "email": "anu@gmail.com",
+        "password": "anu12345",
+        "role": "staff"
+    }
+]

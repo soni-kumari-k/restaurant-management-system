@@ -2,7 +2,6 @@ import json
 import os
 
 
-
 ORDER_FILE = "database/orders.json"
 BILL_FILE = "database/bills.json"
 
@@ -29,7 +28,7 @@ def load_bills():
 
 def save_bills(bills):
 
-    os.makedirs("data", exist_ok=True)
+    os.makedirs("database", exist_ok=True)
 
     with open(BILL_FILE, "w") as file:
         json.dump(bills, file, indent=4)
@@ -41,6 +40,7 @@ def generate_bill():
     bills = load_bills()
 
     if len(orders) == 0:
+
         print("No orders available!")
         return
 
@@ -72,9 +72,9 @@ def generate_bill():
             print("\n========== BILL ==========")
             print("Bill ID       :", bill_id)
             print("Customer      :", order["customer_name"])
-            print("Subtotal      : Rs.", subtotal)
-            print("Tax 5%        : Rs.", tax)
-            print("Grand Total   : Rs.", grand_total)
+            print("Subtotal      : ₹", subtotal)
+            print("Tax 5%        : ₹", tax)
+            print("Grand Total   : ₹", grand_total)
             print("==========================")
 
             return
@@ -89,6 +89,7 @@ def display_bills():
     print("\n========== ALL BILLS ==========")
 
     if len(bills) == 0:
+
         print("No bills available!")
         return
 
@@ -118,13 +119,17 @@ def billing():
         choice = input("Enter your choice: ")
 
         if choice == "1":
+
             generate_bill()
 
         elif choice == "2":
+
             display_bills()
 
         elif choice == "3":
+
             break
 
         else:
+
             print("Invalid choice!")

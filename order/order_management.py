@@ -75,7 +75,7 @@ def create_order():
 
         customer_name = input("Enter Customer Name: ").strip()
 
-        if customer_name.isalpha() and len(customer_name) >= 3:
+        if customer_name.isalpha() and len(customer_name.replace(" ","")) >= 3:
             break
 
         print("Invalid name! Please try again.")
@@ -128,6 +128,29 @@ def create_order():
 
     print("Food not found!")
 
+def delete_order():
+
+    orders = load_orders()
+
+    if len(orders) == 0:
+
+        print("No orders available!")
+        return
+
+    order_id = input("Enter Order ID to delete: ").strip()
+
+    for order in orders:
+
+        if order["order_id"] == order_id:
+
+            orders.remove(order)
+
+            save_orders(orders)
+
+            print("Order deleted successfully!")
+            return
+
+    print("Order ID not found!")
 
 def display_orders():
 
@@ -161,7 +184,8 @@ def order_management():
 
         print("1. Create Order")
         print("2. Display Orders")
-        print("3. Back")
+        print("3. Delete Order")
+        print("4. Back")
 
         choice = input("Enter your choice: ")
 
@@ -174,6 +198,9 @@ def order_management():
             display_orders()
 
         elif choice == "3":
+            delete_order()
+
+        elif choice=="4":
 
             break
 

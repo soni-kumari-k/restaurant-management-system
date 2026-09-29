@@ -1,6 +1,7 @@
 import json
 import os
 import uuid
+from datetime import datetime
 
 
 FILE = "database/tables.json"
@@ -10,15 +11,23 @@ def load_tables():
 
     os.makedirs("database", exist_ok=True)
 
-    if os.path.exists(FILE):
+    if not os.path.exists(FILE):
+
+        return []
+
+    try:
 
         with open(FILE, "r") as file:
             return json.load(file)
 
-    return []
+    except:
+
+        return []
 
 
 def save_tables(tables):
+
+    os.makedirs("database", exist_ok=True)
 
     with open(FILE, "w") as file:
         json.dump(tables, file, indent=4)
@@ -28,36 +37,45 @@ def book_table():
 
     tables = load_tables()
 
-    print("\n========== TABLE BOOKING ==========")
+    print("\n========== BOOK TABLE ==========")
 
-    table_id = str(uuid.uuid4().int)[4]
+    table_id = str(uuid.uuid4().int)[:4]
 
     while True:
 
         customer_name = input("Enter Customer Name: ").strip()
 
-        if customer_name.isalpha() and len(customer_name) >= 3:
+        if customer_name.isalpha() and len(customer_name.replace(" ","")) >= 3:
+
             break
 
         print("Invalid name! Please try again.")
 
     while True:
 
-        date = input("Enter Date: ").strip()
+        date = input("Enter Date (DD-MM-YYYY): ").strip()
 
-        if date:
+        try:
+
+            datetime.strptime(date, "%d-%m-%Y")
             break
 
-        print("Date cannot be empty!")
+        except ValueError:
+
+            print("Invalid date, try again")
 
     while True:
 
-        time = input("Enter Time: ").strip()
+        time = input("Enter Time (HH:MM): ").strip()
 
-        if time:
+        try:
+
+            datetime.strptime(time, "%H:%M")
             break
 
-        print("Time cannot be empty!")
+        except ValueError:
+
+            print("Invalid time, try again")
 
     booking = {
         "table_id": table_id,
@@ -71,7 +89,7 @@ def book_table():
 
     save_tables(tables)
 
-    print("Table booked successfully!")
+    print("\nTable booked successfully!")
     print("Table ID:", table_id)
 
 
@@ -89,18 +107,23 @@ def display_tables():
     for table in tables:
 
         print("------------------------------")
-        print("Table ID       :", table["table_id"])
-        print("Customer Name  :", table["customer_name"])
-        print("Date           :", table["date"])
-        print("Time           :", table["time"])
-        print("Status         :", table["status"])
+        print("Table ID      :", table["table_id"])
+        print("Customer Name :", table["customer_name"])
+        print("Date          :", table["date"])
+        print("Time          :", table["time"])
+        print("Status        :", table["status"])
 
 
 def update_table():
 
     tables = load_tables()
 
-    table_id = input("Enter Table ID: ")
+    if len(tables) == 0:
+
+        print("No table bookings!")
+        return
+
+    table_id = input("Enter Table ID to update: ").strip()
 
     for table in tables:
 
@@ -110,42 +133,72 @@ def update_table():
 
                 customer_name = input("Enter New Customer Name: ").strip()
 
-                if customer_name.isalpha() and len(customer_name) >= 3:
+                if customer_name.isalpha() and len(customer_name.replace(" ","")) >= 3:
+
                     break
 
-                print("Invalid name!")
+                print("Invalid name! Please try again.")
+
+            while True:
+
+                date = input("Enter New Date (DD-MM-YYYY): ").strip()
+
+                try:
+
+                    datetime.strptime(date, "%d-%m-%Y")
+                    break
+
+                except ValueError:
+
+                    print("Invalid date, try again")
+
+            while True:
+
+                time = input("Enter New Time (HH:MM): ").strip()
+
+                try:
+
+                    datetime.strptime(time, "%H:%M")
+                    break
+
+                except ValueError:
+
+                    print("Invalid time, try again")
 
             table["customer_name"] = customer_name
-
-            table["date"] = input("Enter New Date: ")
-            table["time"] = input("Enter New Time: ")
+            table["date"] = date
+            table["time"] = time
+            table["status"] = "Booked"
 
             save_tables(tables)
 
-            print("Table booking updated!")
+            print("Table booking updated successfully!")
             return
 
-    print("Table booking not found!")
+    print("Table ID not found!")
 
 
 def cancel_table():
 
     tables = load_tables()
 
-    table_id = input("Enter Table ID to cancel: ")
+    if len(tables) == 0:
+
+        print("No table bookings!")
+        return
+
+    table_id = input("Enter Table ID to cancel: ").strip()
 
     for table in tables:
 
         if table["table_id"] == table_id:
-
-            table["status"] = "Available"
-
+            tables.remove(table)
             save_tables(tables)
 
-            print("Table booking cancelled!")
+            print("Table booking cancelled successfully!")
             return
 
-    print("Table not found!")
+    print("Table ID not found!")
 
 
 def table_booking():
@@ -162,7 +215,7 @@ def table_booking():
         print("4. Cancel Booking")
         print("5. Back")
 
-        choice = input("Enter your choice: ")
+        choice = input("Enter your choice: ").strip()
 
         if choice == "1":
 
@@ -186,4 +239,4 @@ def table_booking():
 
         else:
 
-            print("Invalid choice!")
+            print("Invalid choice! Please try again.")

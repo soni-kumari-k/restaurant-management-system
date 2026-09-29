@@ -1,30 +1,9 @@
 import json
 import os
 import uuid
-
+import stdiomask
 
 FILE = "database/users.json"
-
-
-def generate_user_id(users):
-
-    while True:
-
-        user_id = str(uuid.uuid4().int)[:10]
-
-        exists = False
-
-        for user in users:
-
-            if user["user_id"] == user_id:
-
-                exists = True
-                break
-
-        if not exists:
-
-            return user_id
-
 
 def signup(role):
 
@@ -40,11 +19,15 @@ def signup(role):
         print("           STAFF SIGN UP")
         print("================================")
 
+
+    user_id = str(uuid.uuid4().int)[:10]
+    
+
     while True:
 
         name = input("Enter Name: ").strip()
 
-        if name.isalpha() and len(name) >= 3:
+        if name.isalpha() and len(name.replace(" ","")) >= 3:
             break
 
         print("Invalid name! Please try again.")
@@ -60,7 +43,7 @@ def signup(role):
 
     while True:
 
-        password = input("Enter Password: ")
+        password = stdiomask.getpass(prompt="Enter Password: ",mask="*")
 
         if 8 <= len(password) <= 15:
             break
@@ -94,7 +77,6 @@ def signup(role):
                 print("Admin already exists!")
                 return
 
-    user_id = generate_user_id(users)
 
     new_user = {
         "user_id": user_id,

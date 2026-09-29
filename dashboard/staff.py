@@ -19,17 +19,22 @@ def staff_menu():
         choice = input("Enter your choice: ")
 
         if choice == "1":
+
             table_booking()
 
         elif choice == "2":
+
             order_management()
 
         elif choice == "3":
+
             billing()
 
         elif choice == "4":
-            print("Staff Logout successful")
+
+            print("Staff Logout successful!")
             break
 
         else:
-            print("Invalid choice")
+
+            print("Invalid choice! Please try again.")

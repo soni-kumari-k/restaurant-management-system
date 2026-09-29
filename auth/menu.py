@@ -4,6 +4,7 @@ import os
 from auth.sign_up import signup
 from auth.sign_in import signin
 from dashboard.admin import admin_menu
+from dashboard.staff import staff_menu
 
 
 FILE = "database/users.json"
@@ -44,6 +45,11 @@ def main_menu():
 
                 signup("admin")
 
+                user = signin("admin")
+
+                if user:
+                    admin_menu()
+
             elif choice == "2":
 
                 print("Thank you!")
@@ -56,7 +62,8 @@ def main_menu():
         else:
 
             print("1. Admin Sign In")
-            print("2. Exit")
+            print("2. Staff Sign In")
+            print("3. Exit")
 
             choice = input("Enter your choice: ")
 
@@ -68,6 +75,13 @@ def main_menu():
                     admin_menu()
 
             elif choice == "2":
+
+                user = signin("staff")
+
+                if user:
+                    staff_menu()
+
+            elif choice == "3":
 
                 print("Thank you!")
                 break
