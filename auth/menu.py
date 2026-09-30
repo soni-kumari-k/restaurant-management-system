@@ -5,7 +5,7 @@ from auth.sign_up import signup
 from auth.sign_in import signin
 from dashboard.admin import admin_menu
 from dashboard.staff import staff_menu
-
+ 
 FILE = "database/users.json"
 
 def admin_exists():
@@ -66,4 +66,3 @@ def main_menu():
             else:
                 print("Invalid choice! Please try again.")
 
-                
