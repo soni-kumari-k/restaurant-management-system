@@ -75,7 +75,7 @@ def create_order():
 
         customer_name = input("Enter Customer Name: ").strip()
 
-        if customer_name.isalpha() and len(customer_name.replace(" ","")) >= 3:
+        if customer_name.replace(" ","").isalpha() and len(customer_name.replace(" ","")) >= 3:
             break
 
         print("Invalid name! Please try again.")

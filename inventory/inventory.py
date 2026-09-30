@@ -50,7 +50,7 @@ def add_item():
 
         item_name = input("Enter Item Name: ").strip()
 
-        if item_name.isalpha() and len(item_name.replace(" ","")) >= 3:
+        if item_name.replace(" ","").isalpha() and len(item_name.replace(" ","")) >= 3:
             break
 
         print("Invalid item name! Please try again.")

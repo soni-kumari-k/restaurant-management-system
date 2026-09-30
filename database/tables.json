@@ -5,5 +5,12 @@
         "date": "",
         "time": "",
         "status": "Available"
+    },
+    {
+        "table_id": "2944",
+        "customer_name": "neha",
+        "date": "06-10-2025",
+        "time": "10:00",
+        "status": "Booked"
     }
 ]

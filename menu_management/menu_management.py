@@ -49,7 +49,7 @@ def add_food():
 
         name = input("Enter Food Name: ").strip()
 
-        if name.isalpha() and len(name.replace(" ","")) >= 3:
+        if name.replace(" ","").isalpha() and len(name.replace(" ","")) >= 3:
             break
 
         print("Invalid food name! Please try again.")
