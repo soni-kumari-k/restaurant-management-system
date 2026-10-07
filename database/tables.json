@@ -1,16 +1,22 @@
 [
     {
-        "table_id": "0",
-        "customer_name": "nishu",
-        "date": "",
-        "time": "",
-        "status": "Available"
+        "table_id": "1001",
+        "capacity": 8
     },
     {
-        "table_id": "2944",
-        "customer_name": "neha",
-        "date": "06-10-2025",
-        "time": "10:00",
-        "status": "Booked"
+        "table_id": "1002",
+        "capacity": 8
+    },
+    {
+        "table_id": "1003",
+        "capacity": 4
+    },
+    {
+        "table_id": "1004",
+        "capacity": 4
+    },
+    {
+        "table_id": "1005",
+        "capacity": 2
     }
 ]

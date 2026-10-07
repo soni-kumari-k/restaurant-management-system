@@ -1,14 +1,34 @@
 [
     {
-        "id": "1001",
-        "name": "pizza",
-        "price": 300,
-        "category": "fast food"
-    },
-    {
         "id": "1002",
         "name": "burger",
         "price": 55,
         "category": "fast food"
+    },
+    {
+        "id": "1005",
+        "name": "chholebhature",
+        "price": 35,
+        "category": "fast food"
+    },
+    {
+        "id": "1003",
+        "name": "jalebi",
+        "price": 40,
+        "category": "sweets"
+    },
+    {
+        "id": "1004",
+        "name": "waterbottle",
+        "price": 20,
+        "category": "drink"
+    },
+    {
+        "food_id": "1006",
+        "food_name": "samosa",
+        "heading": "NORTH INDIAN",
+        "category": "fast food",
+        "half_price": 20.0,
+        "full_price": 40.0
     }
 ]

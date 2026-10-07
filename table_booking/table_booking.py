@@ -1,242 +1,321 @@
 import json
 import os
-import uuid
 from datetime import datetime
 
+TABLE_FILE = "database/tables.json"
+BOOKING_FILE = "database/bookings.json"
 
-FILE = "database/tables.json"
-
-
-def load_tables():
-
-    os.makedirs("database", exist_ok=True)
-
-    if not os.path.exists(FILE):
-
+def load_json(file):
+    if not os.path.exists(file):
         return []
-
     try:
-
-        with open(FILE, "r") as file:
-            return json.load(file)
-
+        with open(file, "r") as f:
+            data = json.load(f)
+        if isinstance(data, list):
+            return data
     except:
+        pass
+    return []
 
-        return []
-
-
-def save_tables(tables):
-
+def save_json(file, data):
     os.makedirs("database", exist_ok=True)
+    with open(file, "w") as f:
+        json.dump(data, f, indent=4)
 
-    with open(FILE, "w") as file:
-        json.dump(tables, file, indent=4)
+def setup_tables():
+    tables = load_json(TABLE_FILE)
+    if not tables:
+        tables = [
+            {"table_id": "1001", "capacity": 8},
+            {"table_id": "1002", "capacity": 8},
+            {"table_id": "1003", "capacity": 4},
+            {"table_id": "1004", "capacity": 4},
+            {"table_id": "1005", "capacity": 2}
+        ]
+        save_json(TABLE_FILE, tables)
+    return tables
 
+def valid_datetime(date_text, time_text):
+    try:
+        value = datetime.strptime(
+            date_text + " " + time_text,
+            "%d-%m-%Y %I:%M %p"
+        )
+        if value < datetime.now():
+            return None
+        return value
+    except:
+        return None
 
-def book_table():
+def get_booked_seats(bookings, date_text, time_text):
+    booked = {}
+    for booking in bookings:
+        if (booking.get("date") == date_text and
+            booking.get("time") == time_text):
+            for table in booking.get("tables", []):
+                table_id = str(table.get("table_id", ""))
+                seats = int(table.get("seats", 0))
+                booked[table_id] = booked.get(table_id, 0) + seats
+    return booked
 
-    tables = load_tables()
+def book_seats():
+    tables = setup_tables()
+    bookings = load_json(BOOKING_FILE)
 
-    print("\n========== BOOK TABLE ==========")
+    print("\n================================")
+    print("          BOOK SEATS")
+    print("================================")
 
-    table_id = str(uuid.uuid4().int)[:4]
+    customer_name = input("Enter Customer Name: ").strip()
+
+    if not customer_name:
+        print("Customer name cannot be empty!")
+        return
 
     while True:
+        seats_text = input("Enter Required Seats: ").strip()
+        if seats_text.isdigit() and int(seats_text) > 0:
+            required_seats = int(seats_text)
+            break
+        print("Enter a valid number of seats!")
 
-        customer_name = input("Enter Customer Name: ").strip()
+    date_text = input("Enter Date (DD-MM-YYYY): ").strip()
+    time_text = input("Enter Time (HH:MM AM/PM): ").strip().upper()
 
-        if customer_name.replace(" ","").isalpha() and len(customer_name.replace(" ","")) >= 3:
+    booking_time = valid_datetime(date_text, time_text)
 
+    if booking_time is None:
+        print("Invalid or past date/time!")
+        return
+
+    booked = get_booked_seats(bookings, date_text, time_text)
+    available = []
+    total_available = 0
+
+    for table in tables:
+        table_id = str(table.get("table_id", ""))
+        capacity = int(table.get("capacity", 0))
+        already_booked = booked.get(table_id, 0)
+        free = capacity - already_booked
+
+        if free > 0:
+            available.append({
+                "table_id": table_id,
+                "free": free
+            })
+            total_available += free
+
+    if total_available < required_seats:
+        print("Not enough seats available!")
+        return
+
+    remaining = required_seats
+    selected_tables = []
+
+    for table in available:
+        if remaining <= 0:
             break
 
-        print("Invalid name! Please try again.")
+        seats_from_table = min(remaining, table["free"])
 
-    while True:
+        selected_tables.append({
+            "table_id": table["table_id"],
+            "seats": seats_from_table
+        })
 
-        date = input("Enter Date (DD-MM-YYYY): ").strip()
-
-        try:
-
-            datetime.strptime(date, "%d-%m-%Y")
-            break
-
-        except ValueError:
-
-            print("Invalid date, try again")
-
-    while True:
-
-        time = input("Enter Time (HH:MM): ").strip()
-
-        try:
-
-            datetime.strptime(time, "%H:%M")
-            break
-
-        except ValueError:
-
-            print("Invalid time, try again")
+        remaining -= seats_from_table
 
     booking = {
-        "table_id": table_id,
+        "booking_id": str(int(datetime.now().timestamp() * 1000)),
         "customer_name": customer_name,
-        "date": date,
-        "time": time,
-        "status": "Booked"
+        "required_seats": required_seats,
+        "date": date_text,
+        "time": time_text,
+        "tables": selected_tables
     }
 
-    tables.append(booking)
+    bookings.append(booking)
+    save_json(BOOKING_FILE, bookings)
 
-    save_tables(tables)
+    print("\nBooking successful!")
+    print("Customer Name:", customer_name)
+    print("Seats Booked :", required_seats)
+    print("Date         :", date_text)
+    print("Time         :", time_text)
+    print("Allocated Tables:")
 
-    print("\nTable booked successfully!")
-    print("Table ID:", table_id)
+    for table in selected_tables:
+        print(
+            "Table",
+            table["table_id"],
+            "-",
+            table["seats"],
+            "seat(s)"
+        )
 
+def display_bookings():
+    bookings = load_json(BOOKING_FILE)
 
-def display_tables():
+    print("\n================================")
+    print("          BOOKINGS")
+    print("================================")
 
-    tables = load_tables()
-
-    print("\n========== TABLE BOOKINGS ==========")
-
-    if len(tables) == 0:
-
-        print("No table bookings!")
+    if not bookings:
+        print("No bookings available!")
         return
 
-    for table in tables:
+    for booking in bookings:
+        print("Booking ID    :", booking.get("booking_id", ""))
+        print("Customer Name :", booking.get("customer_name", ""))
+        print("Seats         :", booking.get("required_seats", 0))
+        print("Date          :", booking.get("date", ""))
+        print("Time          :", booking.get("time", ""))
 
-        print("------------------------------")
-        print("Table ID      :", table["table_id"])
-        print("Customer Name :", table["customer_name"])
-        print("Date          :", table["date"])
-        print("Time          :", table["time"])
-        print("Status        :", table["status"])
+        for table in booking.get("tables", []):
+            print(
+                "Table",
+                table.get("table_id", ""),
+                "-",
+                table.get("seats", 0),
+                "seat(s)"
+            )
 
+        print("--------------------------------")
 
-def update_table():
+def available_seats():
+    tables = setup_tables()
+    bookings = load_json(BOOKING_FILE)
 
-    tables = load_tables()
+    date_text = input("Enter Date (DD-MM-YYYY): ").strip()
+    time_text = input("Enter Time (HH:MM AM/PM): ").strip().upper()
 
-    if len(tables) == 0:
-
-        print("No table bookings!")
+    if valid_datetime(date_text, time_text) is None:
+        print("Invalid or past date/time!")
         return
 
-    table_id = input("Enter Table ID to update: ").strip()
+    booked = get_booked_seats(bookings, date_text, time_text)
+
+    print("\nAvailable Seats")
+    print("--------------------------------")
+
+    total = 0
 
     for table in tables:
+        table_id = str(table.get("table_id", ""))
+        capacity = int(table.get("capacity", 0))
 
-        if table["table_id"] == table_id:
+        free = capacity - booked.get(table_id, 0)
 
-            while True:
+        print(
+            "Table",
+            table_id,
+            ":",
+            free,
+            "seat(s) available"
+        )
 
-                customer_name = input("Enter New Customer Name: ").strip()
+        total += free
 
-                if customer_name.isalpha() and len(customer_name.replace(" ","")) >= 3:
+    print("--------------------------------")
+    print("Total Available Seats:", total)
 
-                    break
+def cancel_booking():
+    bookings = load_json(BOOKING_FILE)
 
-                print("Invalid name! Please try again.")
-
-            while True:
-
-                date = input("Enter New Date (DD-MM-YYYY): ").strip()
-
-                try:
-
-                    datetime.strptime(date, "%d-%m-%Y")
-                    break
-
-                except ValueError:
-
-                    print("Invalid date, try again")
-
-            while True:
-
-                time = input("Enter New Time (HH:MM): ").strip()
-
-                try:
-
-                    datetime.strptime(time, "%H:%M")
-                    break
-
-                except ValueError:
-
-                    print("Invalid time, try again")
-
-            table["customer_name"] = customer_name
-            table["date"] = date
-            table["time"] = time
-            table["status"] = "Booked"
-
-            save_tables(tables)
-
-            print("Table booking updated successfully!")
-            return
-
-    print("Table ID not found!")
-
-
-def cancel_table():
-
-    tables = load_tables()
-
-    if len(tables) == 0:
-
-        print("No table bookings!")
+    if not bookings:
+        print("No bookings available!")
         return
 
-    table_id = input("Enter Table ID to cancel: ").strip()
+    customer_name = input("Enter Customer Name: ").strip()
+    date_text = input("Enter Date (DD-MM-YYYY): ").strip()
+    time_text = input("Enter Time (HH:MM AM/PM): ").strip().upper()
 
-    for table in tables:
+    matching = []
 
-        if table["table_id"] == table_id:
-            tables.remove(table)
-            save_tables(tables)
+    for booking in bookings:
+        if (
+            booking.get("customer_name", "").lower() == customer_name.lower()
+            and booking.get("date") == date_text
+            and booking.get("time") == time_text
+        ):
+            matching.append(booking)
 
-            print("Table booking cancelled successfully!")
-            return
+    if not matching:
+        print("Booking not found!")
+        return
 
-    print("Table ID not found!")
+    booking = matching[0]
 
-
-def table_booking():
+    booked_seats = int(
+        booking.get("required_seats", 0)
+    )
 
     while True:
+        seats_text = input("Enter Seats to Cancel: ").strip()
 
+        if (
+            seats_text.isdigit()
+            and 0 < int(seats_text) <= booked_seats
+        ):
+            cancel_seats = int(seats_text)
+            break
+
+        print("Enter a valid number of seats!")
+
+    if cancel_seats == booked_seats:
+        bookings.remove(booking)
+        save_json(BOOKING_FILE, bookings)
+        print("Booking cancelled successfully!")
+        return
+
+    remaining = cancel_seats
+
+    for table in booking.get("tables", []):
+        if remaining <= 0:
+            break
+
+        table_seats = int(table.get("seats", 0))
+
+        if table_seats <= remaining:
+            remaining -= table_seats
+            table["seats"] = 0
+        else:
+            table["seats"] = table_seats - remaining
+            remaining = 0
+
+    booking["tables"] = [
+        t for t in booking.get("tables", [])
+        if int(t.get("seats", 0)) > 0
+    ]
+
+    booking["required_seats"] = booked_seats - cancel_seats
+
+    save_json(BOOKING_FILE, bookings)
+
+    print(cancel_seats, "seats cancelled successfully!")
+
+def table_booking():
+    while True:
         print("\n================================")
         print("         TABLE BOOKING")
         print("================================")
-
-        print("1. Book Table")
-        print("2. Display Tables")
-        print("3. Update Booking")
+        print("1. Book Seats")
+        print("2. Display Bookings")
+        print("3. Available Seats")
         print("4. Cancel Booking")
         print("5. Back")
 
-        choice = input("Enter your choice: ").strip()
+        choice = input("Enter choice: ").strip()
 
         if choice == "1":
-
-            book_table()
-
+            book_seats()
         elif choice == "2":
-
-            display_tables()
-
+            display_bookings()
         elif choice == "3":
-
-            update_table()
-
+            available_seats()
         elif choice == "4":
-
-            cancel_table()
-
+            cancel_booking()
         elif choice == "5":
-
             break
-
         else:
-
-            print("Invalid choice! Please try again.")
+            print("Invalid choice!")

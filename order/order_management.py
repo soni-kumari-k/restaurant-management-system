@@ -1,181 +1,247 @@
 import json
 import os
 import uuid
+from datetime import datetime
+from menu_management.menu_management import (load_food,display_menu)
 
-
-MENU_FILE = "database/food_menu.json"
-ORDER_FILE = "database/orders.json"
-
-
-def load_menu():
-
-    if os.path.exists(MENU_FILE):
-
-        with open(MENU_FILE, "r") as file:
-            return json.load(file)
-
-    return []
-
+FILE = "database/orders.json"
 
 def load_orders():
-
-    if os.path.exists(ORDER_FILE):
-
-        with open(ORDER_FILE, "r") as file:
-            return json.load(file)
-
+    if not os.path.exists(FILE):
+        return []
+    try:
+        with open(FILE, "r") as file:
+            data = json.load(file)
+            return data
+    except:
+        pass
     return []
 
-
 def save_orders(orders):
-
     os.makedirs("database", exist_ok=True)
-
-    with open(ORDER_FILE, "w") as file:
+    with open(FILE, "w") as file:
         json.dump(orders, file, indent=4)
 
+def generate_order_id(orders):
+    while True:
+        order_id = str(uuid.uuid4().int)[:10]
+        found = False
+        for order in orders:
+            if str(order.get("order_id", "")) == order_id:
+                found = True
+                break
+        if not found:
+            return order_id
+
+def get_food(food_id, food):
+    for item in food:
+        current_id = str(item.get("food_id",item.get("id", "")))
+        if current_id == food_id:
+            return item
+    return None
+
+def find_customer_order(orders,customer_name):
+    for order in orders:
+        if (str(order.get(    "customer_name",    ""))==customer_name.strip().lower()):
+            return order
+    return None
 
 def create_order():
-
-    menu = load_menu()
     orders = load_orders()
-
-    if len(menu) == 0:
-
-        print("No food available in menu!")
+    food = load_food()
+    if not food:
+        print("No food available!")
         return
-
-    print("\n========================================================")
-    print("                     FOOD MENU")
-    print("========================================================")
-
-    print(
-            "ID","      ",        
-            "FOOD NAME","       ",     
-            "PRICE","       ",     
-            "CATEGORY","        "      
+    display_menu()
+    customer_name = input("\nEnter Customer Name: ")
+    if not customer_name.isalpha() :
+        print("Customer name cannot be empty!")
+        return
+    existing = find_customer_order(
+        orders,
+        customer_name
+    )
+    if existing is not None:
+        print("Order already exists for this customer.")
+        print("Use Add Order to add more items.")
+        return
+    order = {
+        "order_id": generate_order_id(orders),
+        "customer_name": customer_name,
+        "items": [],
+        "amount": 0,
+        "created_at": datetime.now().strftime(
+            "%d-%m-%Y %H:%M:%S"
         )
-
-    print("--------------------------------------------------------")
-
-    for food in menu:
-
-        print(
-                    food["id"],"        " ,     
-                    food["name"],"      ",       
-                    food["price"],"        ",      
-                    food["category"],"      "        
-                )
-
-    print("========================================================")
-
-    order_id = str(uuid.uuid4().int)[:10]
-
+    }
     while True:
 
-        customer_name = input("Enter Customer Name: ").strip()
+        food_id = input("\nEnter Food ID: ").strip()
+        item = get_food(food_id,food)
+        if item is None:
+            print("Food not found!")
+            continue
+        
+        size = input(
+            "Enter Half or Full: "
+        ).strip().lower()
 
-        if customer_name.replace(" ","").isalpha() and len(customer_name.replace(" ","")) >= 3:
+        if size not in ["half", "full"]:
+
+            print("Enter only Half or Full!" )
+            continue
+        while True:
+            quantity = input("Enter Quantity: ").strip()
+            if ( quantity.isdigit() and int(quantity) > 0):
+                quantity = int(quantity)
+                break
+            print( "Enter a valid quantity!")
+        if size == "half":price = float(item.get("half_price",0))
+        else:
+            price = float(item.get( "full_price", 0 ) )
+        total = price * quantity
+        order["items"].append({
+            "food_id": str(item.get("food_id",item.get("id", ""))),
+            "food_name": item.get("food_name",item.get("name", "")),
+            "size": size,
+            "quantity": quantity,
+            "price": price,
+            "total": total
+        })
+
+        order["amount"] += total
+        more = input(
+            "Add another item? (yes/no): "
+        ).strip().lower()
+        if more != "yes":
             break
+    save_orders(
+        orders + [order]
+    )
+    print("\nOrder created successfully!")
+    print("Order ID:",order["order_id"]
+    )
 
-        print("Invalid name! Please try again.")
 
-    while True:
-
-        food_id = input("Enter Food ID: ")
-
-        if food_id.isdigit() and len(food_id) == 4:
-            break
-
-        print("Food ID must contain exactly 4 digits!")
-
-    while True:
-
-        quantity = input("Enter Quantity: ")
-
-        if quantity.isdigit() and int(quantity) > 0:
-            break
-
-        print("Quantity must be greater than 0!")
-
-    quantity = int(quantity)
-
-    for food in menu:
-
-        if food["id"] == food_id:
-
-            total = food["price"] * quantity
-
-            new_order = {
-                "order_id": order_id,
-                "customer_name": customer_name,
-                "food_id": food["id"],
-                "food_name": food["name"],
-                "quantity": quantity,
-                "price": food["price"],
-                "total": total
-            }
-
-            orders.append(new_order)
-
-            save_orders(orders)
-
-            print("Order created successfully!")
-            print("Order ID:", order_id)
-            print("Total Amount: Rs.", total)
-
-            return
-
-    print("Food not found!")
-
-def delete_order():
-
+def add_order():
     orders = load_orders()
+    food = load_food()
 
-    if len(orders) == 0:
-
-        print("No orders available!")
+    if not food:
+        print("No food available!")
         return
 
-    order_id = input("Enter Order ID to delete: ").strip()
+    if not orders:
+        print("No order available! Create an order first.")
+        return
 
-    for order in orders:
+    display_menu()
 
-        if order["order_id"] == order_id:
+    customer_name = input("\nEnter Customer Name: ").strip()
+    order = find_customer_order(orders, customer_name)
 
-            orders.remove(order)
+    if order is None:
+        print("Customer order not found!")
+        return
 
-            save_orders(orders)
+    if not isinstance(order.get("items"), list):
+        order["items"] = []
 
-            print("Order deleted successfully!")
-            return
+    if not isinstance(order.get("amount"), (int, float)):
+        order["amount"] = 0
 
-    print("Order ID not found!")
+    while True:
+        food_id = input("\nEnter Food ID: ").strip()
+        item = get_food(food_id, food)
+
+        if item is None:
+            print("Food not found!")
+            continue
+
+        size = input("Enter Half or Full: ").strip().lower()
+
+        if size not in ["half", "full"]:
+            print("Enter only Half or Full!")
+            continue
+
+        while True:
+            quantity = input("Enter Quantity: ").strip()
+
+            if quantity.isdigit() and int(quantity) > 0:
+                quantity = int(quantity)
+                break
+
+            print("Enter a valid quantity!")
+
+        if size == "half":
+            price = float(item.get("half_price", 0))
+        else:
+            price = float(item.get("full_price", 0))
+
+        total = price * quantity
+
+        order["items"].append({
+            "food_id": str(item.get("food_id", item.get("id", ""))),
+            "food_name": item.get("food_name", item.get("name", "")),
+            "size": size,
+            "quantity": quantity,
+            "price": price,
+            "total": total
+        })
+
+        order["amount"] += total
+
+        more = input("Add another item? (yes/no): ").strip().lower()
+
+        if more != "yes":
+            break
+
+    save_orders(orders)
+    print("Order updated successfully!")
 
 def display_orders():
-
     orders = load_orders()
 
-    print("\n========== ORDERS ==========")
+    print("\n================================")
+    print("          ALL ORDERS")
+    print("================================")
 
-    if len(orders) == 0:
-
+    if not orders:
         print("No orders available!")
         return
 
     for order in orders:
+        print( "Order ID     :",order.get("order_id",""))
+        print( "Customer Name:",order.get("customer_name","") )
+        print( "Amount       :",order.get("amount",0) )
 
-        print("------------------------------")
-        print("Order ID      :", order["order_id"])
-        print("Customer      :", order["customer_name"])
-        print("Food          :", order["food_name"])
-        print("Quantity      :", order["quantity"])
-        print("Price         :", order["price"])
-        print("Total         :", order["total"])
+        items = order.get("items", [])
+        for item in items:
+            print("  ",item.get("food_name",""),"|",item.get("size",""),"|" 
+            " Qty:",item.get("quantity",0),"| Total:",item.get("total",0))
+        print("--------------------------------")
 
+
+def delete_order():
+    orders = load_orders()
+    if not orders:
+        print("No orders available!")
+        return
+    customer_name = input("Enter Customer Name: ").strip()
+    new_orders = []
+    deleted = False
+    for order in orders:
+        if (str(order.get("customer_name","")).strip().lower()==customer_name.lower()):
+            deleted = True
+        else:
+            new_orders.append(order)
+    if deleted:
+        save_orders(new_orders)
+        print("Order deleted successfully!")
+    else:
+        print("Order not found!")
 
 def order_management():
-
     while True:
 
         print("\n================================")
@@ -183,27 +249,21 @@ def order_management():
         print("================================")
 
         print("1. Create Order")
-        print("2. Display Orders")
-        print("3. Delete Order")
-        print("4. Back")
+        print("2. Add Order")
+        print("3. Display Order")
+        print("4. Delete Order")
+        print("5. Back")
 
-        choice = input("Enter your choice: ")
-
+        choice = input("Enter choice: ").strip()
         if choice == "1":
-
             create_order()
-
         elif choice == "2":
-
-            display_orders()
-
+            add_order()
         elif choice == "3":
+            display_orders()
+        elif choice == "4":
             delete_order()
-
-        elif choice=="4":
-
+        elif choice == "5":
             break
-
         else:
-
             print("Invalid choice!")

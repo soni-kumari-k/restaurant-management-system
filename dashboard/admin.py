@@ -1,15 +1,13 @@
 from menu_management.menu_management import menu_management
 from table_booking.table_booking import table_booking
 from order.order_management import order_management
-from billing.billing import billing
-from inventory.inventory import inventory_management
+from billing.billing import billing_menu
+from inventory.inventory import inventory_menu
 from dashboard.staff_management import staff_management
+from logs.logs import logs_menu
 
-
-def admin_menu():
-
+def admin_menu(user):
     while True:
-
         print("\n================================")
         print("          ADMIN DASHBOARD")
         print("================================")
@@ -20,39 +18,27 @@ def admin_menu():
         print("4. Billing")
         print("5. Inventory")
         print("6. Staff Management")
-        print("7. Logout")
+        print("7. Logs")
+        print("8. Logout")
 
-        choice = input("Enter your choice: ")
+        choice = input("Enter choice: ").strip()
 
         if choice == "1":
-
             menu_management()
-
         elif choice == "2":
-
             table_booking()
-
         elif choice == "3":
-
             order_management()
-
         elif choice == "4":
-
-            billing()
-
+            billing_menu()
         elif choice == "5":
-
-            inventory_management()
-
+            inventory_menu()
         elif choice == "6":
-
             staff_management()
-
         elif choice == "7":
-
-            print("Admin Logout successful!")
+            logs_menu()
+        elif choice == "8":
+            print("Logged out!")
             break
-
         else:
-
-            print("Invalid choice! Please try again.")
+            print("Invalid choice!")

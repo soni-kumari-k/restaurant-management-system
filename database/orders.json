@@ -1,20 +1,26 @@
 [
     {
-        "order_id": "1495314682",
-        "customer_name": "sapna",
-        "food_id": "1001",
-        "food_name": "pizza",
-        "quantity": 2,
-        "price": 300,
-        "total": 600
-    },
-    {
-        "order_id": "4410711344",
-        "customer_name": "sapna",
-        "food_id": "1001",
-        "food_name": "pizza",
-        "quantity": 2,
-        "price": 300,
-        "total": 600
+        "order_id": "1232207681",
+        "customer_name": "sona",
+        "items": [
+            {
+                "food_id": "1006",
+                "food_name": "samosa",
+                "size": "half",
+                "quantity": 1,
+                "price": 20.0,
+                "total": 20.0
+            },
+            {
+                "food_id": "1006",
+                "food_name": "samosa",
+                "size": "full",
+                "quantity": 4,
+                "price": 40.0,
+                "total": 160.0
+            }
+        ],
+        "amount": 180.0,
+        "created_at": "07-10-2026 22:43:40"
     }
 ]

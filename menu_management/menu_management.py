@@ -1,243 +1,187 @@
 import json
 import os
 
-
 FILE = "database/food_menu.json"
 
+HEADINGS = [
+    "NORTH INDIAN",
+    "SOUTH INDIAN",
+    "CHINESE",
+    "ITALIAN",
+    "DRINKS"
+]
 
-def load_menu():
-
-    os.makedirs("database", exist_ok=True)
-
-    if os.path.exists(FILE):
-
+def load_food():
+    if not os.path.exists(FILE):
+        return []
+    try:
         with open(FILE, "r") as file:
-            return json.load(file)
-
+            data = json.load(file)
+        if isinstance(data, list):
+            return data
+    except:
+        pass
     return []
 
-
-def save_menu(menu):
-
+def save_food(food):
+    os.makedirs("database", exist_ok=True)
     with open(FILE, "w") as file:
-        json.dump(menu, file, indent=4)
+        json.dump(food, file, indent=4)
 
+def generate_food_id(food):
+    max_id = 1000
+    for item in food:
+        value = item.get("food_id",item.get("id", 0))
+        try:
+            value = int(value)
+            if value > max_id:
+                max_id = value
+        except:
+            pass
+    return str(max_id + 1)
 
-def add_food():
+def display_menu():
+    food = load_food()
 
-    menu = load_menu()
+    print("\n==============================================")
+    print("                 FOOD MENU")
+    print("==============================================")
 
-    print("\n========== ADD FOOD ==========")
-
-    while True:
-
-        food_id = input("Enter Food ID (4 digit): ")
-
-        if food_id.isdigit() and len(food_id) == 4:
-            break
-
-        print("Food ID must contain exactly 4 digits!")
-
-    for food in menu:
-
-        if food["id"] == food_id:
-
-            print("Food ID already exists!")
-            return
-
-    while True:
-
-        name = input("Enter Food Name: ").strip()
-
-        if name.replace(" ","").isalpha() and len(name.replace(" ","")) >= 3:
-            break
-
-        print("Invalid food name! Please try again.")
-
-    while True:
-
-        price = input("Enter Price: ")
-
-        if price.isdigit() and int(price) > 0:
-            break
-
-        print("Price must be a positive number!")
-
-    while True:
-
-        category = input("Enter Category: ").strip()
-
-        if category:
-            break
-
-        print("Category cannot be empty!")
-
-    new_food = {
-        "id": food_id,
-        "name": name,
-        "price": int(price),
-        "category": category
-    }
-
-    menu.append(new_food)
-
-    save_menu(menu)
-
-    print("Food added successfully!")
-
-
-def display_food():
-
-    menu = load_menu()
-
-    print("\n========================================================")
-    print("                     FOOD MENU")
-    print("========================================================")
-
-    if len(menu) == 0:
-
+    if not food:
         print("No food available!")
         return
+    for heading in HEADINGS:
+        heading_items = []
+        for item in food:
+            item_heading = str(
+                item.get("heading", "")
+            ).upper()
+            if item_heading == heading:
+                heading_items.append(item)
+        if not heading_items:
+            continue
 
-    print(
-        "ID","      ",        
-        "FOOD NAME","       ",     
-        "PRICE","       ",     
-        "CATEGORY","        "      
-    )
+        print("\n---------- " + heading + " ----------")
+        print("ID     FOOD NAME              CATEGORY        HALF    FULL")
+        print("----------------------------------------------------------")
+        for item in heading_items:
+            food_id = item.get("food_id",item.get("id", ""))
+            name = item.get("food_name",item.get("name", ""))
+            category = item.get("category", "")
+            half = item.get("half_price", 0)
+            full = item.get("full_price", 0)
+            print(str(food_id),"  ",str(name),"  ",str(category),"  ",str(half),"  ",str(full))
 
-    print("--------------------------------------------------------")
+def add_food():
+    food = load_food()
 
-    for food in menu:
-
-        print(
-            food["id"],"        " ,     
-            food["name"],"      ",       
-            food["price"],"        ",      
-            food["category"],"      "        
-        )
-    print("========================================================")
-
-
-def update_food():
-
-    menu = load_menu()
+    print("\n================================")
+    print("             ADD FOOD")
+    print("================================")
 
     while True:
-
-        food_id = input("Enter Food ID to update: ")
-
-        if food_id.isdigit() and len(food_id) == 4:
+        name = input("Enter Food Name: ").strip()
+        if name == "":
+            print("Food name cannot be empty!")
+            continue
+        duplicate = False
+        for item in food:
+            old_name = item.get("food_name",item.get("name", ""))
+            if old_name.lower() == name.lower():
+                duplicate = True
+                break
+        if duplicate:
+            print("Food already exists!")
+        else:
             break
+    print("\nSelect Heading")
+    for i in range(len(HEADINGS)):
+        print(str(i + 1) + ".",HEADINGS[i])
 
-        print("Food ID must contain exactly 4 digits!")
+    while True:
+        choice = input("Enter heading choice: ").strip()
+        if (choice.isdigit() and 1 <= int(choice) <= len(HEADINGS)):
+            heading = HEADINGS[int(choice) - 1]
+            break
+        print("Invalid heading!")
+    category = input("Enter Category: ").strip()
 
-    for food in menu:
+    while True:
+        half = input("Enter Half Price: ").strip()
+        try:
+            half_price = float(half)
+            if half_price >= 0:
+                break
+        except:
+            pass
+        print("Enter a valid price!")
 
-        if food["id"] == food_id:
-
-            while True:
-
-                name = input("Enter New Name: ").strip()
-
-                if name.isalpha() and len(name.replace(" ","")) >= 3:
-                    break
-
-                print("Invalid food name!")
-
-            while True:
-
-                price = input("Enter New Price: ")
-
-                if price.isdigit() and int(price) > 0:
-                    break
-
-                print("Price must be a positive number!")
-
-            while True:
-
-                category = input("Enter New Category: ").strip()
-
-                if category:
-                    break
-
-                print("Category cannot be empty!")
-
-            food["name"] = name
-            food["price"] = int(price)
-            food["category"] = category
-
-            save_menu(menu)
-
-            print("Food updated successfully!")
-            return
-
-    print("Food not found!")
+    while True:
+        full = input("Enter Full Price: ").strip()
+        try:
+            full_price = float(full)
+            if full_price >= 0:
+                break
+        except:
+            pass
+        print("Enter a valid price!")
+    item = {
+        "food_id": generate_food_id(food),
+        "food_name": name,
+        "heading": heading,
+        "category": category,
+        "half_price": half_price,
+        "full_price": full_price
+    }
+    food.append(item)
+    save_food(food)
+    print("Food added successfully!")
+    print("Food ID:", item["food_id"])
 
 
 def delete_food():
+    food = load_food()
 
-    menu = load_menu()
+    print("\n================================")
+    print("            DELETE FOOD")
+    print("================================")
 
-    while True:
-
-        food_id = input("Enter Food ID to delete: ")
-
-        if food_id.isdigit() and len(food_id) == 4:
-            break
-
-        print("Food ID must contain exactly 4 digits!")
-
-    for food in menu:
-
-        if food["id"] == food_id:
-
-            menu.remove(food)
-
-            save_menu(menu)
-
-            print("Food deleted successfully!")
-            return
-
-    print("Food not found!")
+    food_id = input("Enter Food ID: ").strip()
+    new_food = []
+    deleted = False
+    for item in food:
+        item_id = str(item.get("food_id",item.get("id", "")))
+        if item_id == food_id:
+            deleted = True
+        else:
+            new_food.append(item)
+    if deleted:
+        save_food(new_food)
+        print("Food deleted successfully!")
+    else:
+        print("Food not found!")
 
 
 def menu_management():
-
     while True:
 
         print("\n================================")
-        print("       MENU MANAGEMENT")
+        print("        MENU MANAGEMENT")
         print("================================")
 
         print("1. Add Food")
-        print("2. Display Food")
-        print("3. Update Food")
-        print("4. Delete Food")
-        print("5. Back")
+        print("2. Display Menu")
+        print("3. Delete Food")
+        print("4. Back")
 
-        choice = input("Enter your choice: ")
-
+        choice = input("Enter choice: ").strip()
         if choice == "1":
-
             add_food()
-
         elif choice == "2":
-
-            display_food()
-
+            display_menu()
         elif choice == "3":
-
-            update_food()
-
-        elif choice == "4":
-
             delete_food()
-
-        elif choice == "5":
-
+        elif choice == "4":
             break
-
         else:
-
-            print("Invalid choice! Please try again.")
+            print("Invalid choice!")
