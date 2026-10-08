@@ -1,0 +1,15 @@
+[
+    {
+        "booking_id": "1791393171582",
+        "customer_name": "sona",
+        "required_seats": 6,
+        "date": "12-10-2026",
+        "time": "03:00 PM",
+        "tables": [
+            {
+                "table_id": "1001",
+                "seats": 6
+            }
+        ]
+    }
+]

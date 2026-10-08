@@ -1,0 +1,29 @@
+[
+    {
+        "bill_id": "2407899640",
+        "order_id": "1232207681",
+        "customer_name": "sona",
+        "items": [
+            {
+                "food_id": "1006",
+                "food_name": "samosa",
+                "size": "half",
+                "quantity": 1,
+                "price": 20.0,
+                "total": 20.0
+            },
+            {
+                "food_id": "1006",
+                "food_name": "samosa",
+                "size": "full",
+                "quantity": 4,
+                "price": 40.0,
+                "total": 160.0
+            }
+        ],
+        "amount": 180.0,
+        "tax": 9.0,
+        "grand_total": 189.0,
+        "payment_method": "UPI"
+    }
+]

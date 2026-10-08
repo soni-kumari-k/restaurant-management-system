@@ -1,0 +1,22 @@
+[
+    {
+        "table_id": "1001",
+        "capacity": 8
+    },
+    {
+        "table_id": "1002",
+        "capacity": 8
+    },
+    {
+        "table_id": "1003",
+        "capacity": 4
+    },
+    {
+        "table_id": "1004",
+        "capacity": 4
+    },
+    {
+        "table_id": "1005",
+        "capacity": 2
+    }
+]
