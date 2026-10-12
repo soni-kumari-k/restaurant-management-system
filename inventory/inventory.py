@@ -43,11 +43,10 @@ def add_item():
     print("================================")
 
     while True:
-        name = input("Enter Item Name: ").strip()
-        if name:
+        name = input("Enter User Name: ").strip()
+        if name.replace(" ","").isalpha() and len(name.replace(" ","")) >= 3:
             break
-        print("Item name cannot be empty!")
-
+        print("Invalid name! Please try again.")
     while True:
         quantity = input("Enter Quantity: ").strip()
         try:

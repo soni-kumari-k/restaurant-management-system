@@ -80,10 +80,10 @@ def add_food():
     print("================================")
 
     while True:
-        name = input("Enter Food Name: ").strip()
-        if name == "":
-            print("Food name cannot be empty!")
-            continue
+        name = input("Enter Food Name: ")
+        if name.replace(" ","").isalpha() and len(name.replace(" ",""))>=3:
+            break
+        print("Food name try again")
         duplicate = False
         for item in food:
             old_name = item.get("food_name",item.get("name", ""))
